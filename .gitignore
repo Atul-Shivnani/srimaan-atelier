@@ -23,3 +23,5 @@ raw_video
 *.njsproj
 *.sln
 *.sw?
+
+.vercel
