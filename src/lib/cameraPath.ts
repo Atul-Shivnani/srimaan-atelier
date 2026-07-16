@@ -3,9 +3,15 @@ import { cityStart, cityEnd } from "./mapTiming";
 
 const midpoints = cities.map((_, i) => cityStart(i) + 0.065);
 const positions = cities.map((c) => project(c.lat, c.lon));
-const center = { xPct: 50, yPct: 50 };
+const center = {
+  xPct: positions.reduce((s, p) => s + p.xPct, 0) / positions.length,
+  yPct: positions.reduce((s, p) => s + p.yPct, 0) / positions.length,
+};
 
-const ZOOM_IN = 2.4;
+// The map is shown "contained" (full extent visible, letterboxed) at
+// scale 1, so zooming in on one city needs a much larger factor than a
+// cover-cropped background would.
+const ZOOM_IN = 4.5;
 const ZOOM_OUT_START = cityEnd(cities.length - 1);
 
 function lerp(a: number, b: number, t: number) {

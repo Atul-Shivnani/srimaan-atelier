@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Beat from "../Beat";
 import GujaratMap from "../GujaratMap";
 import LocationCallouts from "../LocationCallouts";
+import MapAttribution from "../MapAttribution";
 import { useSceneProgress } from "../../lib/useSceneProgress";
 import { computeCityStates } from "../../lib/mapTiming";
 import { cameraPosition, cameraScale } from "../../lib/cameraPath";
@@ -21,20 +22,26 @@ export default function LocationsScene() {
       data-scene-label="Where we are"
       className="relative h-[340vh]"
     >
-      <div className="sticky top-0 h-screen overflow-hidden">
-        <div
-          className="absolute inset-0"
-          style={{
-            transform: `scale(${scale})`,
-            transformOrigin: `${cam.xPct}% ${cam.yPct}%`,
-            transition: "transform-origin 0.15s linear, transform 0.15s linear",
-          }}
-        >
-          <img src="/images/map-texture.png" alt="" className="absolute inset-0 h-full w-full object-cover" />
-          <GujaratMap activeId={activeId} revealedIds={revealedIds} />
-          <LocationCallouts activeId={activeId} revealedIds={revealedIds} />
+      <div className="sticky top-0 h-screen overflow-hidden bg-charcoal-deep">
+        {/* Sized to the real map's own aspect ratio ("contain"), so the full
+            mosaic is always reachable — object-fit:cover would crop away
+            most of this tall image before the camera transform even runs. */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="relative h-full w-auto"
+            style={{
+              aspectRatio: "1024 / 2304",
+              transform: `scale(${scale})`,
+              transformOrigin: `${cam.xPct}% ${cam.yPct}%`,
+            }}
+          >
+            <img src="/images/map-texture.png" alt="" className="absolute inset-0 h-full w-full" />
+            <GujaratMap activeId={activeId} revealedIds={revealedIds} />
+            <LocationCallouts activeId={activeId} revealedIds={revealedIds} mapScale={scale} />
+          </div>
         </div>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-charcoal/60 via-transparent to-charcoal/70" />
+        <MapAttribution />
 
         <div className="relative z-10 mx-auto h-full max-w-6xl px-6 md:px-12">
           <Beat progress={progress} start={0} end={0.045} fade={0.02} className="absolute inset-x-6 top-[10%] md:inset-x-12">

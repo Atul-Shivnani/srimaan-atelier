@@ -53,6 +53,7 @@ export default function GujaratMap({ activeId, revealedIds, className = "" }: Gu
                 transformOrigin: "12px 22px",
                 transformBox: "fill-box",
                 transition: "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                filter: "drop-shadow(0 1px 2.5px rgba(0,0,0,0.8))",
               }}
             >
               <path
@@ -60,7 +61,8 @@ export default function GujaratMap({ activeId, revealedIds, className = "" }: Gu
                 transform="translate(-12 -22)"
                 fill={isHq ? "var(--color-maroon-bright)" : "var(--color-brass)"}
                 stroke="var(--color-canvas)"
-                strokeWidth="1"
+                strokeWidth="1.6"
+                strokeLinejoin="round"
               />
             </g>
           </g>
