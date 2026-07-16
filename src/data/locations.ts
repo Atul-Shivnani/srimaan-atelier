@@ -52,31 +52,20 @@ export const cities: CityLocation[] = [
   },
 ];
 
-// The background map is a real mosaic of OpenStreetMap tiles (zoom 11,
-// x: 1437-1440, y: 890-898), so pins are projected with the same Web
-// Mercator math the tiles themselves use — not a linear approximation —
-// to land exactly on the real streets/labels underneath.
-const ZOOM = 11;
-const TILE_PX = 256;
-const MOSAIC_LEFT_PX = 1437 * TILE_PX;
-const MOSAIC_TOP_PX = 890 * TILE_PX;
-const MOSAIC_WIDTH_PX = 4 * TILE_PX;
-const MOSAIC_HEIGHT_PX = 9 * TILE_PX;
+// Bounding box the stylized map background is projected against, in
+// degrees, with padding.
+const BOUNDS = { lonMin: 72.75, lonMax: 73.3, latMin: 21.5, latMax: 22.85 };
 
-function mercatorPx(lat: number, lon: number) {
-  const scale = TILE_PX * 2 ** ZOOM;
-  const x = ((lon + 180) / 360) * scale;
-  const latRad = (lat * Math.PI) / 180;
-  const y = ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * scale;
-  return { x, y };
-}
+// Longitude degrees compress relative to latitude away from the equator —
+// correct for it so the projected shape isn't stretched east-west.
+const LAT_COS = Math.cos((22.1 * Math.PI) / 180);
 
 export function project(lat: number, lon: number): { xPct: number; yPct: number } {
-  const { x, y } = mercatorPx(lat, lon);
-  return {
-    xPct: ((x - MOSAIC_LEFT_PX) / MOSAIC_WIDTH_PX) * 100,
-    yPct: ((y - MOSAIC_TOP_PX) / MOSAIC_HEIGHT_PX) * 100,
-  };
+  const x = (lon - BOUNDS.lonMin) * LAT_COS;
+  const xMax = (BOUNDS.lonMax - BOUNDS.lonMin) * LAT_COS;
+  const xPct = (x / xMax) * 100;
+  const yPct = ((BOUNDS.latMax - lat) / (BOUNDS.latMax - BOUNDS.latMin)) * 100;
+  return { xPct, yPct };
 }
 
 const EARTH_RADIUS_KM = 6371;
