@@ -18,44 +18,58 @@ export default function Cursor() {
     const ringX = gsap.quickTo(ring, "x", { duration: 0.5, ease: "power3" });
     const ringY = gsap.quickTo(ring, "y", { duration: 0.5, ease: "power3" });
 
+    const lastPoint = { x: -1, y: -1 };
+    let activeMode: string | null = null;
+
+    // Hit-tests whatever is actually under the cursor right now, rather than
+    // relying on mouseover/mouseout bubbling (which fires on every child
+    // boundary crossing and re-fires when data-cursor is toggled by scroll
+    // instead of by mouse movement).
+    function refreshCursorMode() {
+      if (lastPoint.x < 0) return;
+      const el = document.elementFromPoint(lastPoint.x, lastPoint.y) as HTMLElement | null;
+      const target = el?.closest("[data-cursor]");
+      const mode = target?.getAttribute("data-cursor") ?? null;
+      if (mode === activeMode) return;
+      activeMode = mode;
+
+      gsap.to(ring, { scale: mode === "scissor" ? 1.7 : mode === "link" ? 2 : 1, duration: 0.25 });
+      if (glyphRef.current) glyphRef.current.textContent = mode === "scissor" ? "✂" : mode === "link" ? "→" : "";
+    }
+
     function onMove(e: MouseEvent) {
+      lastPoint.x = e.clientX;
+      lastPoint.y = e.clientY;
       setDotX(e.clientX);
       setDotY(e.clientY);
       ringX(e.clientX);
       ringY(e.clientY);
+      refreshCursorMode();
     }
     function onDown() {
       gsap.to(ring, { scale: 0.72, duration: 0.2 });
     }
     function onUp() {
-      gsap.to(ring, { scale: 1, duration: 0.2 });
+      refreshCursorMode();
+      gsap.to(ring, { scale: activeMode === "scissor" ? 1.7 : activeMode === "link" ? 2 : 1, duration: 0.2 });
     }
-    function onOver(e: MouseEvent) {
-      const target = (e.target as HTMLElement).closest("[data-cursor]");
-      if (!target) return;
-      const mode = target.getAttribute("data-cursor");
-      gsap.to(ring, { scale: mode === "scissor" ? 1.7 : 2, duration: 0.25 });
-      if (glyphRef.current) glyphRef.current.textContent = mode === "scissor" ? "✂" : mode === "link" ? "→" : "";
-    }
-    function onOut(e: MouseEvent) {
-      const target = (e.target as HTMLElement).closest("[data-cursor]");
-      if (!target) return;
-      gsap.to(ring, { scale: 1, duration: 0.25 });
-      if (glyphRef.current) glyphRef.current.textContent = "";
+    let scrollRaf = 0;
+    function onScroll() {
+      cancelAnimationFrame(scrollRaf);
+      scrollRaf = requestAnimationFrame(refreshCursorMode);
     }
 
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mousedown", onDown);
     window.addEventListener("mouseup", onUp);
-    document.addEventListener("mouseover", onOver);
-    document.addEventListener("mouseout", onOut);
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("mousedown", onDown);
       window.removeEventListener("mouseup", onUp);
-      document.removeEventListener("mouseover", onOver);
-      document.removeEventListener("mouseout", onOut);
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(scrollRaf);
     };
   }, []);
 

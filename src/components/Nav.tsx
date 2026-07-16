@@ -1,17 +1,28 @@
 import MagneticButton from "./MagneticButton";
 import { site } from "../data/content";
 
-const links = [
+const storyLinks = [
   { href: "#about", label: "About" },
   { href: "#services", label: "Services" },
   { href: "#stats", label: "Reach" },
   { href: "#contact", label: "Contact" },
 ];
 
-export default function Nav() {
+const standaloneLinks = [
+  { href: "/", label: "Home" },
+  { href: "/locations", label: "Where We Are" },
+];
+
+interface NavProps {
+  variant?: "story" | "standalone";
+}
+
+export default function Nav({ variant = "story" }: NavProps) {
+  const links = variant === "story" ? storyLinks : standaloneLinks;
+
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-5 md:px-12">
-      <a href="#top" data-cursor="link" className="font-display text-lg tracking-wide text-canvas">
+      <a href="/#top" data-cursor="link" className="font-display text-lg tracking-wide text-canvas">
         Srimaan
       </a>
       <nav className="hidden items-center gap-8 font-mono text-xs uppercase tracking-[0.15em] text-bone md:flex">
