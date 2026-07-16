@@ -43,7 +43,7 @@ export default function LocationsScene() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-charcoal/60 via-transparent to-charcoal/70" />
         <MapAttribution />
 
-        <div className="relative z-10 mx-auto h-full max-w-6xl px-6 md:px-12">
+        <div className="pointer-events-none relative z-10 mx-auto h-full max-w-6xl px-6 md:px-12">
           <Beat progress={progress} start={0} end={0.045} fade={0.02} className="absolute inset-x-6 top-[10%] md:inset-x-12">
             <p className="mb-4 font-mono text-xs uppercase tracking-[0.3em] text-brass">Beyond the workshop</p>
             <h2 className="max-w-2xl font-display text-4xl leading-tight text-canvas md:text-6xl">

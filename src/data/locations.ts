@@ -78,3 +78,21 @@ export function project(lat: number, lon: number): { xPct: number; yPct: number 
     yPct: ((y - MOSAIC_TOP_PX) / MOSAIC_HEIGHT_PX) * 100,
   };
 }
+
+const EARTH_RADIUS_KM = 6371;
+
+function haversineKm(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(bLat - aLat);
+  const dLon = toRad(bLon - aLon);
+  const a =
+    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(aLat)) * Math.cos(toRad(bLat)) * Math.sin(dLon / 2) ** 2;
+  return EARTH_RADIUS_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const hq = cities.find((c) => c.role === "hq")!;
+
+/** Straight-line distance from HQ, in whole km. 0 for the HQ itself. */
+export function kmFromHq(city: CityLocation): number {
+  return Math.round(haversineKm(hq.lat, hq.lon, city.lat, city.lon));
+}
