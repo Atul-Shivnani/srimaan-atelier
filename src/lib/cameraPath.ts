@@ -1,10 +1,18 @@
 import { cities, project } from "../data/locations";
-import { cityStart } from "./mapTiming";
+import { cityStart, cityEnd } from "./mapTiming";
 
 const midpoints = cities.map((_, i) => cityStart(i) + 0.065);
 const positions = cities.map((c) => project(c.lat, c.lon));
+const center = { xPct: 50, yPct: 50 };
 
-export function cameraPosition(progress: number): { xPct: number; yPct: number } {
+const ZOOM_IN = 2.4;
+const ZOOM_OUT_START = cityEnd(cities.length - 1);
+
+function lerp(a: number, b: number, t: number) {
+  return a + (b - a) * t;
+}
+
+function sequentialPosition(progress: number): { xPct: number; yPct: number } {
   if (progress <= midpoints[0]) return positions[0];
   if (progress >= midpoints[midpoints.length - 1]) return positions[positions.length - 1];
 
@@ -13,8 +21,24 @@ export function cameraPosition(progress: number): { xPct: number; yPct: number }
       const t = (progress - midpoints[i]) / (midpoints[i + 1] - midpoints[i]);
       const a = positions[i];
       const b = positions[i + 1];
-      return { xPct: a.xPct + (b.xPct - a.xPct) * t, yPct: a.yPct + (b.yPct - a.yPct) * t };
+      return { xPct: lerp(a.xPct, b.xPct, t), yPct: lerp(a.yPct, b.yPct, t) };
     }
   }
   return positions[0];
+}
+
+// Camera follows each city in turn, zoomed in, then pulls back to a full
+// top-down overview once every location has had its moment.
+export function cameraPosition(progress: number): { xPct: number; yPct: number } {
+  if (progress <= ZOOM_OUT_START) return sequentialPosition(progress);
+
+  const t = Math.min(1, (progress - ZOOM_OUT_START) / (1 - ZOOM_OUT_START));
+  const last = positions[positions.length - 1];
+  return { xPct: lerp(last.xPct, center.xPct, t), yPct: lerp(last.yPct, center.yPct, t) };
+}
+
+export function cameraScale(progress: number): number {
+  if (progress <= ZOOM_OUT_START) return ZOOM_IN;
+  const t = Math.min(1, (progress - ZOOM_OUT_START) / (1 - ZOOM_OUT_START));
+  return lerp(ZOOM_IN, 1, t);
 }

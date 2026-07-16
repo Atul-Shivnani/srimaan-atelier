@@ -1,4 +1,4 @@
-export type SceneName = "cloth" | "scissor" | "stitch" | "shirt" | "story" | "map";
+export type SceneName = "cloth" | "scissor" | "stitch" | "shirt" | "story" | "map-topdown";
 
 interface CacheEntry {
   images: HTMLImageElement[];
@@ -11,7 +11,7 @@ const cache = new Map<SceneName, CacheEntry>();
 
 const PAD_WIDTH: Partial<Record<SceneName, number>> = {
   story: 4,
-  map: 4,
+  "map-topdown": 4,
 };
 
 // Loading hundreds of large frames in one synchronous burst can stall the

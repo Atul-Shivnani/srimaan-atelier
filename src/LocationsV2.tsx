@@ -10,7 +10,7 @@ import Footer from "./components/Footer";
 
 function LocationsV2() {
   useEffect(() => {
-    preloadScene("map", 289);
+    preloadScene("map-topdown", 97);
   }, []);
 
   useSmoothScroll();
