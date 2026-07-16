@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-charcoal: #1b1815;
+  --color-charcoal-deep: #121009;
+  --color-canvas: #ede6d6;
+  --color-canvas-dim: #d9d0ba;
+  --color-maroon: #7a1f2b;
+  --color-maroon-bright: #9c2c3a;
+  --color-brass: #c9a227;
+  --color-brass-soft: #e0c576;
+  --color-slate: #3e4c4f;
+  --color-bone: #b9b0a0;
+
+  --font-display: "Fraunces", "Iowan Old Style", serif;
+  --font-body: "IBM Plex Sans", "Helvetica Neue", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    background: var(--color-charcoal);
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-charcoal);
+    color: var(--color-canvas);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  ::selection {
+    background: var(--color-maroon);
+    color: var(--color-canvas);
+  }
+
+  a,
+  button {
+    cursor: none;
+  }
+
+  @media (pointer: coarse) {
+    body,
+    a,
+    button {
+      cursor: auto;
+    }
+  }
+}
+
+@keyframes thread-dash {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+.animate-thread-dash {
+  animation: thread-dash 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
